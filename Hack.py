@@ -45,6 +45,7 @@ keyboard.add_hotkey('ctrl + shift + a', lambda: setMode("JumpWhenGrounded"))
 keyboard.add_hotkey('ctrl + shift + c', lambda: setMode("Idle"))
 
 Vars.localEntity = addPlayerEntity("Me",Offsets.offsets["local"])
+Utils.entities_aob_scan()
 
 while True:
     Vars.localEntity.updateVars()
