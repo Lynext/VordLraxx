@@ -83,7 +83,7 @@ class WinProcess(BaseProcess):
         psapi.EnumProcesses(byref(lpidProcess), cb, byref(cbNeeded))
         nReturned = cbNeeded.value/sizeof(c_ulong())
 
-        pidProcess = [i for i in lpidProcess][:nReturned]
+        pidProcess = [i for i in lpidProcess][:int(nReturned)]
         for pid in pidProcess:
             proc={ "pid": int(pid) }
             hProcess = kernel32.OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, False, pid)
@@ -99,7 +99,7 @@ class WinProcess(BaseProcess):
     def processes_from_name(processName):
         processes = []
         for process in WinProcess.list():
-            if processName == process.get("name", None) or (process.get("name","").lower().endswith(".exe") and process.get("name","")[:-4]==processName):
+            if processName == process.get("name", None) or (process.get("name",b"").lower().endswith(b".exe") and process.get("name",b"")[:-4]==processName):
                 processes.append(process)
 
         if len(processes) > 0:

@@ -1,11 +1,9 @@
-class fakeIt ():
-    lpBaseOfDll = 0
-
-pm = None
+PROCESS_NAME = b'Brawlhalla.exe'
+mem = None
 debug = False
-modules = {"0": fakeIt()}
-moduleBase = 0
 mode = "Idle"
+localPointer = 0
 localEntity = None
 entities = {}
 uniqueEntityID = 0
+entityPointers = []
