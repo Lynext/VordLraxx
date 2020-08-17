@@ -1,9 +1,13 @@
 PROCESS_NAME = b'Brawlhalla.exe'
 mem = None
 debug = False
-mode = "Idle"
+mode = "SpamMaster"
 localPointer = 0
-localEntity = None
+localPlayer = None
+target = None
 entities = {}
 uniqueEntityID = 0
 entityPointers = []
+ginput = None
+end = False
+lastJump = 0
