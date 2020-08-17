@@ -11,3 +11,4 @@ entityPointers = []
 ginput = None
 end = False
 lastJump = 0
+jumpCooldown = 500

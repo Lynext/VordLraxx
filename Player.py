@@ -43,3 +43,8 @@ class Player ():
             self.grounded = True
         else:
             self.grounded = False
+
+        if Vars.mem.Address(self.pointer + Offsets.offsets["canDodge"]).read(type='int') == 0:
+            self.canDodge = True
+        else:
+            self.canDodge = False

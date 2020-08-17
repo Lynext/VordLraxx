@@ -47,26 +47,41 @@ def AI ():
     if Vars.localPlayer.inAnimation == True:
         return
 
+    Vars.localPlayer.updateInfo()
     dx = Vars.target.x - Vars.localPlayer.x
     dy = Vars.target.y - Vars.localPlayer.y
     if Vars.localPlayer.grounded == False:
         if 1673 - Vars.localPlayer.x > 0:
-            if Utils.gTime() - Vars.lastJump > 500:
+            if Utils.gTime() - Vars.lastJump > Vars.jumpCooldown:
                 Vars.lastJump = Utils.gTime()
                 Vars.ginput.write(calculate_actual_input() | Offsets.UP)
                 reset_input()
             else:
                 Vars.ginput.write(calculate_actual_input() | Offsets.RIGHT)
         else:
-            if Utils.gTime() - Vars.lastJump > 500:
+            if Utils.gTime() - Vars.lastJump > Vars.jumpCooldown:
                 Vars.lastJump = Utils.gTime()
                 Vars.ginput.write(calculate_actual_input() | Offsets.UP)
                 reset_input()
             else:
                 Vars.ginput.write(calculate_actual_input() | Offsets.LEFT)
         return
+
     if Vars.mode == "SpamMaster":
-        if abs(dx) < 350 and abs(dy) < 50:
+        if Vars.target.inAnimation and abs(dx + Vars.target.xVel - Vars.localPlayer.xVel) < 300 and abs(dy + Vars.target.yVel - Vars.localPlayer.yVel) < 300:
+            if Vars.localPlayer.canDodge:
+                print('Cool Dodge')
+                Vars.ginput.write(Offsets.DODGE)
+                time.sleep(0.05)
+                reset_input()
+            elif Utils.gTime() - Vars.lastJump > Vars.jumpCooldown:
+                print('Jump Dodge')
+                Vars.lastJump = Utils.gTime()
+                Vars.ginput.write(Offsets.UP)
+                time.sleep(0.05)
+                reset_input()
+            return
+        if abs(dx + Vars.target.xVel - Vars.localPlayer.xVel) < 350 and abs(dy + Vars.target.yVel - Vars.localPlayer.yVel) < 50:
             if Vars.localPlayer.x < Vars.target.x:
                 Vars.ginput.write(calculate_actual_input() | Offsets.RIGHT | Offsets.HEAVY_ATTACK)
                 reset_input()
@@ -75,11 +90,6 @@ def AI ():
                 Vars.ginput.write(calculate_actual_input() | Offsets.LEFT | Offsets.HEAVY_ATTACK)
                 reset_input()
                 print("LEFT ATTACK")
-        else:
-            if dx > 0:
-                Vars.ginput.write(calculate_actual_input() | Offsets.RIGHT)
-            else:
-                Vars.ginput.write(calculate_actual_input() | Offsets.LEFT)
 
 def update ():
     if Vars.end:

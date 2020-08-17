@@ -17,6 +17,7 @@ offsets["xVel"] = 0x328
 offsets["yVel"] = 0x320
 offsets["inStun"] = 0x180
 offsets["jumpCount"] = 0x1F0
+offsets["canDodge"] = 0x154
 
 QUICK_ATTACK = 640
 HEAVY_ATTACK = 64
