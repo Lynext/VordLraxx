@@ -18,8 +18,23 @@ def reverseDir (dir):
     if dir == "down":
         return "up"
 
+def canGravityCancel ():
+    if canAttack() and canDodge():
+        return True
+    return False
+
 def canJump ():
-    if gTime() - Vars.lastJump > Vars.jumpCooldown and Vars.localPlayer.jumpCount > 0:
+    if Vars.localPlayer.jumpCount > 0:
+        return True
+    return False
+
+def canDodge():
+    if Vars.localPlayer.canDodge:
+        return True
+    return False
+
+def canAttack ():
+    if Vars.localPlayer.canAttack:
         return True
     return False
 

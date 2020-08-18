@@ -18,48 +18,87 @@ def calculateActualInput():
     val |= Offsets.HEAVY_ATTACK * keyboard.is_pressed('x')
     return val
 
-def dodge (towards = "spot"):
-    if towards == "spot":
-        Vars.ginput.write(Offsets.DODGE)
+def dash (towards):
     if towards == "left":
         Vars.ginput.write(Offsets.DODGE | Offsets.LEFT)
     if towards == "right":
         Vars.ginput.write(Offsets.DODGE | Offsets.RIGHT)
-    resetInput()
 
-def run (dir):
+def gravityCancel ():
+    Vars.ginput.write(Offsets.DODGE)
+    resetInput()
+    #time.sleep(0.1)
+
+def dodge (towards = "spot", diagonal = 0):
+    if towards == "spot":
+        Vars.ginput.write(Offsets.DODGE)
+    if towards == "left":
+        Vars.ginput.write(Offsets.UP | Offsets.LEFT)
+        resetInput()
+        Vars.ginput.write(Offsets.DODGE | diagonal | Offsets.LEFT)
+    if towards == "right":
+        Vars.ginput.write(Offsets.UP | Offsets.RIGHT)
+        resetInput()
+        Vars.ginput.write(Offsets.DODGE | diagonal | Offsets.RIGHT)
+    if towards == "up":
+        Vars.ginput.write(Offsets.UP)
+        resetInput()
+        Vars.ginput.write(Offsets.DODGE | Offsets.UP)
+    resetInput()
+    time.sleep(0.1)
+
+def run (dir, duration):
     if dir == "left":
-        if Vars.ginput.read() != Offsets.LEFT:
-            resetInput()
+        rt = Utils.gTime()
+        while (Utils.gTime() - rt < duration):
             Vars.ginput.write(calculateActualInput() | Offsets.LEFT)
     elif dir == "right":
-        if Vars.ginput.read() != Offsets.RIGHT:
-            resetInput()
+        rt = Utils.gTime()
+        while (Utils.gTime() - rt < duration):
             Vars.ginput.write(calculateActualInput() | Offsets.RIGHT)
+    resetInput()
 
-def sideHeavy (towards):
+def sideHeavy (towards, duration = 0):
     if towards == "right":
+        rt = Utils.gTime()
         Vars.ginput.write(calculateActualInput() | Offsets.RIGHT | Offsets.HEAVY_ATTACK)
-        resetInput()
+        while (Utils.gTime() - rt < duration):
+            Vars.ginput.write(calculateActualInput() | Offsets.RIGHT | Offsets.HEAVY_ATTACK)
     elif towards == "left":
+        rt = Utils.gTime()
         Vars.ginput.write(calculateActualInput() | Offsets.LEFT | Offsets.HEAVY_ATTACK)
-        resetInput()
+        while (Utils.gTime() - rt < duration):
+            Vars.ginput.write(calculateActualInput() | Offsets.LEFT | Offsets.HEAVY_ATTACK)
+    resetInput()
 
-def jump (towards = "up"):
-    print("JUMP")
+def jump (towards = "up", duration = 100):
     Vars.lastJump = Utils.gTime()
     if towards == "up":
-        while (Utils.gTime() - Vars.lastJump < 500):
+        Vars.ginput.write(calculateActualInput() | Offsets.UP)
+        rt = Utils.gTime()
+        while (Utils.gTime() - rt < duration):
             Vars.ginput.write(calculateActualInput() | Offsets.UP)
+            resetInput(u = Offsets.UP)
     if towards == "left":
-        Vars.ginput.write(calculateActualInput() | Offsets.UP | Offsets.LEFT)
+        Vars.ginput.write(calculateActualInput() | Offsets.UP)
+        resetInput()
+        rt = Utils.gTime()
+        while (Utils.gTime() - rt < duration):
+            Vars.ginput.write(calculateActualInput() | Offsets.UP | Offsets.LEFT)
+            resetInput(u = Offsets.UP)
     if towards == "right":
-        Vars.ginput.write(calculateActualInput() | Offsets.UP | Offsets.RIGHT)
+        Vars.ginput.write(calculateActualInput() | Offsets.UP)
+        resetInput()
+        rt = Utils.gTime()
+        while (Utils.gTime() - rt < duration):
+            Vars.ginput.write(calculateActualInput() | Offsets.UP | Offsets.RIGHT)
+            resetInput(u = Offsets.UP)
     resetInput()
 
 def resetInput(hard = False, u = 0):
     if hard:
+        time.sleep(0.03)
         Vars.ginput.write(0)
-        #time.sleep(0.03)
-    #time.sleep(0.03)
+        return
+    time.sleep(0.03)
     Vars.ginput.write(calculateActualInput() | u)

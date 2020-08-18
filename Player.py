@@ -17,6 +17,7 @@ class Player ():
     grounded = False
     inAnimation = False
     inStun = False
+    canAttack = False
     jumpCount = 2
     name = "DefaultEntityName"
     pointer = 0
@@ -110,3 +111,8 @@ class Player ():
             self.canDodge = True
         else:
             self.canDodge = False
+
+        if Vars.mem.Address(self.pointer + Offsets.offsets["canAttack"]).read(type='int') == 0:
+            self.canAttack = True
+        else:
+            self.canAttack = False

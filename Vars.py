@@ -10,12 +10,10 @@ uniqueEntityID = 0
 entityPointers = []
 ginput = None
 end = False
-lastJump = 0
-jumpCooldown = 500
 map = "shipwreck"
 
 
 # GAME INFO
 info = {}
 info["maps"] = {}
-info["maps"]["shipwreck"] = {"fallOffsetY": -1848.99 - 320, "centerOfX": 1673}
+info["maps"]["shipwreck"] = {"fallOffsetY": -1848.99 - 160, "centerOfX": 1673}

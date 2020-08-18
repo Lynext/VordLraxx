@@ -22,6 +22,10 @@ def init ():
     Vars.target = Vars.entities[2]
     keyboard.add_hotkey('ctrl+end', lambda: safeExit())
     keyboard.add_hotkey('ctrl+d', lambda: setDebug(not Vars.debug))
+    keyboard.add_hotkey('ctrl+r', lambda: act("right"))
+
+def act (arg):
+    Controller.run("right",800)
 
 def setMode (m):
     Vars.mode = m
@@ -31,54 +35,38 @@ def setDebug (d):
 
 def dontFallToDeath ():
     print("Trying not to fall.")
+    dir = "left"
     if Vars.info["maps"][Vars.map]["centerOfX"] - Vars.localPlayer.x > 0:
-        if Utils.canJump():
-            Controller.jump("right")
-        else:
-            Controller.run("right")
+        dir = "right"
+    if Utils.canJump():
+            Controller.jump(dir, 800)
+    elif Utils.canDodge():
+        Controller.dodge(dir, Offsets.UP)
+    elif Vars.localPlayer.canAttack:
+        Controller.sideHeavy(dir, 800)
     else:
-        if Utils.canJump():
-            Controller.jump("left")
-        else:
-            Controller.run("left")
+        Controller.run(dir,800)
+
+def OnlyDodge ():
+    realEstDiff = Vars.localPlayer.dist(Vars.target, type = "realEst")
+    if Vars.target.inAnimation and Vars.localPlayer.dist(Vars.target, rtnType = "val") <= 384:
+        if Utils.canDodge():
+            print('Cool Dodge')
+            Controller.dodge(Utils.reverseDir(realEstDiff.xDir), Offsets.UP)
+        elif Utils.canJump():
+            print('Jump Dodge')
+            Controller.jump(Utils.reverseDir(realEstDiff.xDir))
 
 def AI ():
     if Vars.mode == "Manuel":
         return
 
-    if Vars.localPlayer.inAnimation == True:
-        return
-
     if Vars.localPlayer.y < Vars.info["maps"][Vars.map]["fallOffsetY"]:
         dontFallToDeath()
-        return
 
     if Vars.mode == "OnlyDodge":
-        realEstDiff = Vars.localPlayer.dist(Vars.target, type = "realEst")
-        if Vars.target.inAnimation and Vars.localPlayer.dist(Vars.target, rtnType = "val") <= 256:
-            if Vars.localPlayer.canDodge:
-                print('Cool Dodge')
-                Controller.dodge("spot")
-            elif Utils.canJump():
-                print('Jump Dodge')
-                Controller.jump()
+        OnlyDodge()
         return
-
-    if Vars.mode == "SpamMaster":
-        realEstDiff = Vars.localPlayer.dist(Vars.target, type = "realEst")
-        if Vars.target.inAnimation and Vars.localPlayer.dist(Vars.target, rtnType = "val") <= 256:
-            if Vars.localPlayer.canDodge:
-                print('Cool Dodge')
-                Controller.dodge(Utils.reverseDir(realEstDiff.xDir))
-            elif Utils.canJump():
-                print('Jump Dodge')
-                Controller.jump(Utils.reverseDir(realEstDiff.xDir))
-            return
-
-        if Vars.localPlayer.grounded and realEstDiff.x <= 750 and realEstDiff.y <= 8:
-            print(realEstDiff.xDir.upper() + " HEAVY ATTACK")
-            Controller.sideHeavy(realEstDiff.xDir)
-            return
 
 def update ():
     if Vars.end:
