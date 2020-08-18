@@ -71,6 +71,30 @@ def sideHeavy (towards, duration = 0):
             Vars.ginput.write(calculateActualInput() | Offsets.LEFT | Offsets.HEAVY_ATTACK)
     resetInput()
 
+def neutralHeavy (towards, duration = 0):
+    if towards == "right":
+        rt = Utils.gTime()
+        Vars.ginput.write(calculateActualInput() | Offsets.RIGHT)
+        resetInput()
+        Vars.ginput.write(calculateActualInput() | Offsets.HEAVY_ATTACK)
+        while (Utils.gTime() - rt < duration):
+            Vars.ginput.write(calculateActualInput() | Offsets.HEAVY_ATTACK)
+    elif towards == "left":
+        rt = Utils.gTime()
+        Vars.ginput.write(calculateActualInput() | Offsets.LEFT)
+        resetInput()
+        Vars.ginput.write(calculateActualInput() | Offsets.HEAVY_ATTACK)
+        while (Utils.gTime() - rt < duration):
+            Vars.ginput.write(calculateActualInput() | Offsets.HEAVY_ATTACK)
+    resetInput()
+
+def sideQuick (towards):
+    if towards == "right":
+        Vars.ginput.write(calculateActualInput() | Offsets.RIGHT | Offsets.QUICK_ATTACK)
+    elif towards == "left":
+        Vars.ginput.write(calculateActualInput() | Offsets.LEFT | Offsets.QUICK_ATTACK)
+    resetInput()
+
 def jump (towards = "up", duration = 100):
     Vars.lastJump = Utils.gTime()
     if towards == "up":

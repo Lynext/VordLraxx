@@ -1,8 +1,8 @@
 
 ginputBaseOffset = 0x34
 
-ginputSig = b"\x90\x64\x65\x62\x03..\x20........\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
-entitySig = b"\x90\x64\x0A"
+entitySig = b"\x90\x64......................\x01"
+groundWeaponSig = b"\x90\x64\x30\x57\x02"
 recursivePtrOffsets = [0x268, 0x4c]
 
 offsets = {}
@@ -19,6 +19,7 @@ offsets["inStun"] = 0x180
 offsets["jumpCount"] = 0x1F0
 offsets["canDodge"] = 0x154
 offsets["canAttack"] = 0x3C
+offsets["groundWeaponX"] = 0xF0
 
 QUICK_ATTACK = 640
 HEAVY_ATTACK = 64

@@ -1,7 +1,7 @@
 PROCESS_NAME = b'Brawlhalla.exe'
 mem = None
 debug = False
-mode = "OnlyDodge"
+mode = "SpamMaster"
 localPointer = 0
 localPlayer = None
 target = None
@@ -11,7 +11,8 @@ entityPointers = []
 ginput = None
 end = False
 map = "shipwreck"
-
+directStart = False
+started = False
 
 # GAME INFO
 info = {}

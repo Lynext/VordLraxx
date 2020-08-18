@@ -75,22 +75,20 @@ def dereferenceOffsets(nameAndOffsets):
         ptr = Vars.mem.process.read(Vars.mem.Address(ptr + offset))
     return ptr
 
-def ginputAobScan():
-    print('Scanning memory for ginput')
+def groundWeaponScan():
+    print('Scanning memory for ground weapons')
     modules = Vars.mem.process.list_modules()
     regions = Vars.mem.process.iter_region(start_offset = modules[Vars.PROCESS_NAME], protec = PAGE_READWRITE)
-    ginput_pointers = []
-    print("Performing deep scan for ginput")
+    entityPointers = []
+    print("Performing deep scan for entities")
     for start, size in regions:
-        # if len(ginput_pointers) >= 1:
-        #     break
-        aobScan(ginput_pointers, start, size, pattern = Offsets.ginputSig, offset = 0)
+        #print(str(start) + " " + str(size))
+        if len(entityPointers) >= 40:
+            break
+        aobScan(entityPointers, start, size, pattern = Offsets.groundWeaponSig, offset = 0, entityCheck = False)
 
-    print('Found %d ginput : %s' % (len(ginput_pointers), ', '.join([hex(e) for e in ginput_pointers])))
-    assert len(ginput_pointers) == 1, "invalid number of ginput pointers found, find a better sig"
-    ginput_pointer = ginput_pointers[0]
-    print('g_input: %s' % hex(ginput_pointer))
-    return ginput_pointer
+    print('Found %d ground weapons: %s' % (len(entityPointers), ', '.join([hex(e) for e in entityPointers])))
+    return entityPointers
 
 def entitiesAobScan():
     print('Scanning memory for entities')
@@ -99,13 +97,28 @@ def entitiesAobScan():
     entityPointers = []
     print("Performing deep scan for entities")
     for start, size in regions:
+        #print(str(start) + " " + str(size))
         if len(entityPointers) >= 4:
             break
-        aobScan(entityPointers, start, size, pattern = Offsets.entitySig, offset = 0, entityCheck=True)
+        aobScan(entityPointers, start, size, pattern = Offsets.entitySig, offset = 0, entityCheck = True)
 
     print('Found %d entities: %s' % (len(entityPointers), ', '.join([hex(e) for e in entityPointers])))
     entityPointers.remove(Vars.localPointer)
     return entityPointers
+
+def findFirstPointers ():
+    Vars.uniqueEntityID = 0
+    print("Finding pointers..")
+    Vars.entities = {}
+    ginputPtr = dereferenceOffsets(Offsets.offsets["ginput"])
+    Vars.ginput = Vars.mem.Address(ginputPtr + Offsets.ginputBaseOffset)
+    Vars.localPointer = dereferenceOffsets(Offsets.offsets["local"])
+    Vars.entityPointers = entitiesAobScan()
+    preparePlayers()
+    Vars.target = Vars.entities[2]
+    Vars.started = True
+    print("Your hex : " + hex(Vars.localPointer))
+    print("ginput hex: " + hex(ginputPtr))
 
 def addPlayer (pointer):
     Vars.uniqueEntityID += 1

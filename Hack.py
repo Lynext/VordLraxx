@@ -12,23 +12,25 @@ def safeExit ():
 
 def init ():
     Vars.mem = MemWorker(name = Vars.PROCESS_NAME)
-    Vars.localPointer = Utils.dereferenceOffsets(Offsets.offsets["local"])
-    ginputPtr = Utils.dereferenceOffsets(Offsets.offsets["ginput"])
-    Vars.ginput = Vars.mem.Address(ginputPtr + Offsets.ginputBaseOffset)
-    Vars.entityPointers = Utils.entitiesAobScan()
-    Utils.preparePlayers()
-    print("Your hex : " + hex(Vars.localPointer))
-    print("ginput hex: " + hex(ginputPtr))
-    Vars.target = Vars.entities[2]
+    if Vars.directStart:
+        Utils.findFirstPointers()
     keyboard.add_hotkey('ctrl+end', lambda: safeExit())
     keyboard.add_hotkey('ctrl+d', lambda: setDebug(not Vars.debug))
     keyboard.add_hotkey('ctrl+r', lambda: act("right"))
+    keyboard.add_hotkey('ctrl+v', lambda: setStarted(True))
+    print("Started!")
 
 def act (arg):
-    Controller.run("right",800)
+    Controller.sideQuick("right")
+    time.sleep(0.29)
+    Controller.neutralHeavy("right",0)
 
 def setMode (m):
     Vars.mode = m
+
+def setStarted (st):
+    Vars.localPointer = 0
+    Vars.started = st
 
 def setDebug (d):
     Vars.debug = d
@@ -61,6 +63,15 @@ def OnlyDodge ():
             print('Jump Dodge')
             Controller.jump(Utils.reverseDir(realEstDiff.xDir))
 
+def SpamMaster ():
+    realEstDiff = Vars.localPlayer.dist(Vars.target, type = "realEst")
+    if realEstDiff.x <= 512 and realEstDiff.y <= 16:
+        Controller.sideQuick(realEstDiff.xDir)
+        time.sleep(0.3)
+        Controller.neutralHeavy(realEstDiff.xDir,0)
+    elif realEstDiff.yDir == "up" and realEstDiff.x >= 300 and realEstDiff.x <= 512 and realEstDiff.y >= 64 and realEstDiff.y <= 128:
+        Controller.neutralHeavy(realEstDiff.xDir,0)
+
 def AI ():
     if Vars.mode == "Manuel":
         return
@@ -72,9 +83,18 @@ def AI ():
         OnlyDodge()
         return
 
+    if Vars.mode == "SpamMaster":
+        SpamMaster()
+        return
+
 def update ():
     if Vars.end:
         exit()
+    if not Vars.started:
+        return
+    if Vars.started and Vars.localPointer == 0:
+        Utils.findFirstPointers()
+        Utils.groundWeaponScan()
     for i in Vars.entities:
         Vars.entities[i].update()
     if Vars.debug:
