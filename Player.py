@@ -1,5 +1,12 @@
 import Vars
 import Offsets
+import math
+
+class Vector2 ():
+    x = 0
+    y = 0
+    xDir = ""
+    yDir = ""
 
 class Player ():
     id = 0
@@ -19,6 +26,61 @@ class Player ():
 
     def printInfo (self):
         print("[X] : " + str(self.x) + " [Y] : " + str(self.y))
+
+    def dist (self, targ, type = "est", rtnType = "vec"):
+        if type == "real" and rtnType == "val":
+            return math.sqrt((self.x - targ.x) * (self.x - targ.x) + (self.y - targ.y) * (self.y - targ.y))
+        if type == "est" and rtnType == "val":
+            return math.sqrt(((self.x + self.xVel) - (targ.x + targ.xVel)) * ((self.x + self.xVel) - (targ.x + targ.xVel)) + ((self.y + self.yVel) - (targ.y + targ.yVel)) * ((self.y + self.yVel) - (targ.y + targ.yVel)))
+        if type == "est" and rtnType == "vec":
+            rX = (self.x + self.xVel) - (targ.x + targ.xVel)
+            rY = (self.y + self.yVel) - (targ.y + targ.yVel)
+            rtn = Vector2()
+            rtn.x = rX
+            rtn.y = rY
+            if rtn.x < 0:
+                rtn.xDir = "right"
+            else:
+                rtn.xDir = "left"
+            if rtn.y < 0:
+                rtn.yDir = "down"
+            else:
+                rtn.yDir = "up"
+            return rtn
+        if type == "real" and rtnType == "vec":
+            rX = (self.x) - (targ.x)
+            rY = (self.y) - (targ.y)
+            rtn = Vector2()
+            rtn.x = rX
+            rtn.y = rY
+            if rtn.x < 0:
+                rtn.xDir = "right"
+            else:
+                rtn.xDir = "left"
+            if rtn.y < 0:
+                rtn.yDir = "down"
+            else:
+                rtn.yDir = "up"
+            rtn.x = abs(rtn.x)
+            rtn.y = abs(rtn.y)
+            return rtn
+        if type == "realEst" and rtnType == "vec":
+            rX = (self.x + self.xVel) - (targ.x + targ.xVel)
+            rY = (self.y + self.yVel) - (targ.y + targ.yVel)
+            rtn = Vector2()
+            rtn.x = rX
+            rtn.y = rY
+            if rtn.x < 0:
+                rtn.xDir = "right"
+            else:
+                rtn.xDir = "left"
+            if rtn.y < 0:
+                rtn.yDir = "down"
+            else:
+                rtn.yDir = "up"
+            rtn.x = abs(rtn.x)
+            rtn.y = abs(rtn.y)
+            return rtn
 
     def update (self):
         self.updateInfo()

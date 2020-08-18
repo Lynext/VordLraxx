@@ -8,6 +8,21 @@ import time
 def gTime ():
     return int(round(time.time() * 1000))
 
+def reverseDir (dir):
+    if dir == "left":
+        return "right"
+    if dir == "right":
+        return "left"
+    if dir == "up":
+        return "down"
+    if dir == "down":
+        return "up"
+
+def canJump ():
+    if gTime() - Vars.lastJump > Vars.jumpCooldown and Vars.localPlayer.jumpCount > 0:
+        return True
+    return False
+
 def isBaseOfEntity(address):
     try:
         ptr = address
@@ -22,7 +37,7 @@ def isBaseOfEntity(address):
 
 def aobScan(entityPointers, start, size, pattern=None, offset = 0, entityCheck = False):
     allTheBytes = Vars.mem.process.read(Vars.mem.Address(start), type = 'bytes', maxlen = size)
-    #print(all_the_bytes)
+    #print(allTheBytes)
     matches = re.finditer(pattern, allTheBytes)
     for match in matches:
         span = match.span()
@@ -31,6 +46,7 @@ def aobScan(entityPointers, start, size, pattern=None, offset = 0, entityCheck =
             if not entityCheck:
                 entityPointers.append(address)
             elif address not in entityPointers and isBaseOfEntity(address):
+                #print(match)
                 entityPointers.append(address)
 
 def dereferenceOffsets(nameAndOffsets):
@@ -69,8 +85,8 @@ def entitiesAobScan():
             break
         aobScan(entityPointers, start, size, pattern = Offsets.entitySig, offset = 0, entityCheck=True)
 
+    print('Found %d entities: %s' % (len(entityPointers), ', '.join([hex(e) for e in entityPointers])))
     entityPointers.remove(Vars.localPointer)
-    print('Found %d entities (except you) : %s' % (len(entityPointers), ', '.join([hex(e) for e in entityPointers])))
     return entityPointers
 
 def addPlayer (pointer):

@@ -2,7 +2,7 @@
 ginputBaseOffset = 0x34
 
 ginputSig = b"\x90\x64\x65\x62\x03..\x20........\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
-entitySig = b"\x90\x64......................\x01"
+entitySig = b"\x90\x64"
 recursivePtrOffsets = [0x268, 0x4c]
 
 offsets = {}
