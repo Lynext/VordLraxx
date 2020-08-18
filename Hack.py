@@ -38,14 +38,18 @@ def dontFallToDeath ():
     dir = "left"
     if Vars.info["maps"][Vars.map]["centerOfX"] - Vars.localPlayer.x > 0:
         dir = "right"
-    if Utils.canJump():
-            Controller.jump(dir, 800)
+    if Utils.canJump() and Vars.localPlayer.jumpCount == 2:
+        print("Jumping to save us. " + str(Vars.localPlayer.jumpCount) + " left.")
+        Controller.jump(dir, 500)
     elif Utils.canDodge():
+        print("Dodging to save us.")
         Controller.dodge(dir, Offsets.UP)
-    elif Vars.localPlayer.canAttack:
-        Controller.sideHeavy(dir, 800)
+    elif Utils.canAttack():
+        print("Attacking to save us.")
+        Controller.sideHeavy(dir, 500)
     else:
-        Controller.run(dir,800)
+        print("Cant dodge, cant jump and no heavy attack. We are prob dead.")
+        Controller.run(dir,500)
 
 def OnlyDodge ():
     realEstDiff = Vars.localPlayer.dist(Vars.target, type = "realEst")

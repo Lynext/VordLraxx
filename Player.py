@@ -27,7 +27,7 @@ class Player ():
 
     def printInfo (self):
         print("[X] : " + str(self.x) + " [Y] : " + str(self.y))
-
+        print("Jumps : " + str(self.jumpCount))
     def dist (self, targ, type = "est", rtnType = "vec"):
         if type == "real" and rtnType == "val":
             return math.sqrt((self.x - targ.x) * (self.x - targ.x) + (self.y - targ.y) * (self.y - targ.y))

@@ -24,16 +24,19 @@ def canGravityCancel ():
     return False
 
 def canJump ():
+    Vars.localPlayer.updateInfo()
     if Vars.localPlayer.jumpCount > 0:
         return True
     return False
 
 def canDodge():
+    Vars.localPlayer.updateInfo()
     if Vars.localPlayer.canDodge:
         return True
     return False
 
 def canAttack ():
+    Vars.localPlayer.updateInfo()
     if Vars.localPlayer.canAttack:
         return True
     return False
