@@ -21,9 +21,7 @@ def init ():
     print("Started!")
 
 def act (arg):
-    Controller.sideQuick("right")
-    time.sleep(0.29)
-    Controller.neutralHeavy("right",0)
+    Controller.jump("right", 300)
 
 def setMode (m):
     Vars.mode = m
@@ -40,18 +38,31 @@ def dontFallToDeath ():
     dir = "left"
     if Vars.info["maps"][Vars.map]["centerOfX"] - Vars.localPlayer.x > 0:
         dir = "right"
+    if dir == "left":
+        Vars.ginput.write(Controller.calculateActualInput() | Offsets.LEFT)
+    else:
+        Vars.ginput.write(Controller.calculateActualInput() | Offsets.RIGHT)
     if Utils.canJump() and Vars.localPlayer.jumpCount == 2:
         print("Jumping to save us. " + str(Vars.localPlayer.jumpCount) + " left.")
-        Controller.jump(dir, 500)
+        Controller.jump(dir, 300)
     elif Utils.canDodge():
         print("Dodging to save us.")
         Controller.dodge(dir, Offsets.UP)
     elif Utils.canAttack():
         print("Attacking to save us.")
-        Controller.sideHeavy(dir, 500)
+        Controller.sideHeavy(dir, 200)
     else:
         print("Cant dodge, cant jump and no heavy attack. We are prob dead.")
-        Controller.run(dir,500)
+
+def ZeroToDeath ():
+    realEstDiff = Vars.localPlayer.dist(Vars.target, type = "realEst")
+    if Vars.target.inAnimation and Vars.localPlayer.dist(Vars.target, rtnType = "val") <= 384:
+        if Utils.canDodge():
+            print('Cool Dodge')
+            Controller.dodge(Utils.reverseDir(realEstDiff.xDir), Offsets.UP)
+        elif Utils.canJump():
+            print('Jump Dodge')
+            Controller.jump(Utils.reverseDir(realEstDiff.xDir))
 
 def OnlyDodge ():
     realEstDiff = Vars.localPlayer.dist(Vars.target, type = "realEst")
@@ -64,27 +75,44 @@ def OnlyDodge ():
             Controller.jump(Utils.reverseDir(realEstDiff.xDir))
 
 def SpamMaster ():
+    if not Vars.localPlayer.grounded:
+        return
     realEstDiff = Vars.localPlayer.dist(Vars.target, type = "realEst")
     if realEstDiff.x <= 512 and realEstDiff.y <= 16:
         Controller.sideQuick(realEstDiff.xDir)
         time.sleep(0.3)
         Controller.neutralHeavy(realEstDiff.xDir,0)
-    elif realEstDiff.yDir == "up" and realEstDiff.x >= 300 and realEstDiff.x <= 512 and realEstDiff.y >= 64 and realEstDiff.y <= 128:
+        Controller.resetInput()
+    elif realEstDiff.yDir == "up" and realEstDiff.x >= 200 and realEstDiff.x <= 512 and realEstDiff.y >= 128 and realEstDiff.y <= 300:
         Controller.neutralHeavy(realEstDiff.xDir,0)
+        time.sleep(0.5) # sucssesful, sleep
+    elif realEstDiff.x <= 512 and realEstDiff.y <= 300:
+        Controller.sideHeavy(realEstDiff.xDir,0)
+        time.sleep(0.5) # sucssesful, sleep
 
 def AI ():
     if Vars.mode == "Manuel":
         return
 
-    if Vars.localPlayer.y < Vars.info["maps"][Vars.map]["fallOffsetY"]:
+    if not Vars.localPlayer.grounded and Vars.localPlayer.y < Vars.info["maps"][Vars.map]["fallOffsetY"]:
+        Vars.keepPressed = Offsets.LEFT
+        if Vars.info["maps"][Vars.map]["centerOfX"] - Vars.localPlayer.x > 0:
+            Vars.keepPressed = Offsets.RIGHT
         dontFallToDeath()
+    elif Vars.localPlayer.grounded and Vars.keepPressed != 0:
+        Vars.keepPressed = 0
+        Controller.resetInput()
 
     if Vars.mode == "OnlyDodge":
         OnlyDodge()
         return
 
-    if Vars.mode == "SpamMaster":
-        SpamMaster()
+    # if Vars.mode == "SpamMaster":
+    #     SpamMaster()
+    #     return
+
+    if Vars.mode == "ZeroToDeath":
+        ZeroToDeath()
         return
 
 def update ():
@@ -94,7 +122,7 @@ def update ():
         return
     if Vars.started and Vars.localPointer == 0:
         Utils.findFirstPointers()
-        Utils.groundWeaponScan()
+        #Utils.groundWeaponScan()
     for i in Vars.entities:
         Vars.entities[i].update()
     if Vars.debug:

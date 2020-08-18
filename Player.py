@@ -28,14 +28,16 @@ class Player ():
     def printInfo (self):
         print("[X] : " + str(self.x) + " [Y] : " + str(self.y))
         print("Jumps : " + str(self.jumpCount))
+
     def dist (self, targ, type = "est", rtnType = "vec"):
+        self.updateInfo()
         if type == "real" and rtnType == "val":
-            return math.sqrt((self.x - targ.x) * (self.x - targ.x) + (self.y - targ.y) * (self.y - targ.y))
+            return math.sqrt((self.x - targ.x * Vars.velMultiplier) * (self.x - targ.x * Vars.velMultiplier) + (self.y - targ.y * Vars.velMultiplier) * (self.y - targ.y * Vars.velMultiplier))
         if type == "est" and rtnType == "val":
-            return math.sqrt(((self.x + self.xVel) - (targ.x + targ.xVel)) * ((self.x + self.xVel) - (targ.x + targ.xVel)) + ((self.y + self.yVel) - (targ.y + targ.yVel)) * ((self.y + self.yVel) - (targ.y + targ.yVel)))
+            return math.sqrt(((self.x + self.xVel * Vars.velMultiplier) - (targ.x + targ.xVel * Vars.velMultiplier)) * ((self.x + self.xVel * Vars.velMultiplier) - (targ.x + targ.xVel * Vars.velMultiplier)) + ((self.y + self.yVel * Vars.velMultiplier) - (targ.y + targ.yVel * Vars.velMultiplier)) * ((self.y + self.yVel * Vars.velMultiplier) - (targ.y + targ.yVel * Vars.velMultiplier)))
         if type == "est" and rtnType == "vec":
-            rX = (self.x + self.xVel) - (targ.x + targ.xVel)
-            rY = (self.y + self.yVel) - (targ.y + targ.yVel)
+            rX = (self.x + self.xVel * Vars.velMultiplier) - (targ.x + targ.xVel * Vars.velMultiplier)
+            rY = (self.y + self.yVel * Vars.velMultiplier) - (targ.y + targ.yVel * Vars.velMultiplier)
             rtn = Vector2()
             rtn.x = rX
             rtn.y = rY
@@ -66,8 +68,8 @@ class Player ():
             rtn.y = abs(rtn.y)
             return rtn
         if type == "realEst" and rtnType == "vec":
-            rX = (self.x + self.xVel) - (targ.x + targ.xVel)
-            rY = (self.y + self.yVel) - (targ.y + targ.yVel)
+            rX = (self.x + self.xVel * Vars.velMultiplier) - (targ.x + targ.xVel * Vars.velMultiplier)
+            rY = (self.y + self.yVel * Vars.velMultiplier) - (targ.y + targ.yVel * Vars.velMultiplier)
             rtn = Vector2()
             rtn.x = rX
             rtn.y = rY

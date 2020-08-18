@@ -73,6 +73,12 @@ def sideHeavy (towards, duration = 0):
 
 def neutralHeavy (towards, duration = 0):
     if towards == "right":
+        if duration == 0:
+            Vars.ginput.write(calculateActualInput() | Offsets.RIGHT)
+            resetInput()
+            Vars.ginput.write(calculateActualInput() | Offsets.HEAVY_ATTACK)
+            resetInput()
+            return
         rt = Utils.gTime()
         Vars.ginput.write(calculateActualInput() | Offsets.RIGHT)
         resetInput()
@@ -80,6 +86,12 @@ def neutralHeavy (towards, duration = 0):
         while (Utils.gTime() - rt < duration):
             Vars.ginput.write(calculateActualInput() | Offsets.HEAVY_ATTACK)
     elif towards == "left":
+        if duration == 0:
+            Vars.ginput.write(calculateActualInput() | Offsets.LEFT)
+            resetInput()
+            Vars.ginput.write(calculateActualInput() | Offsets.HEAVY_ATTACK)
+            resetInput()
+            return
         rt = Utils.gTime()
         Vars.ginput.write(calculateActualInput() | Offsets.LEFT)
         resetInput()
@@ -95,28 +107,25 @@ def sideQuick (towards):
         Vars.ginput.write(calculateActualInput() | Offsets.LEFT | Offsets.QUICK_ATTACK)
     resetInput()
 
-def jump (towards = "up", duration = 100):
+def jump (towards = "up", duration = 200):
     Vars.lastJump = Utils.gTime()
     if towards == "up":
         Vars.ginput.write(calculateActualInput() | Offsets.UP)
         rt = Utils.gTime()
         while (Utils.gTime() - rt < duration):
             Vars.ginput.write(calculateActualInput() | Offsets.UP)
-            resetInput(u = Offsets.UP)
     if towards == "left":
         Vars.ginput.write(calculateActualInput() | Offsets.UP)
         resetInput()
         rt = Utils.gTime()
         while (Utils.gTime() - rt < duration):
             Vars.ginput.write(calculateActualInput() | Offsets.UP | Offsets.LEFT)
-            resetInput(u = Offsets.UP)
     if towards == "right":
         Vars.ginput.write(calculateActualInput() | Offsets.UP)
         resetInput()
         rt = Utils.gTime()
         while (Utils.gTime() - rt < duration):
             Vars.ginput.write(calculateActualInput() | Offsets.UP | Offsets.RIGHT)
-            resetInput(u = Offsets.UP)
     resetInput()
 
 def resetInput(hard = False, u = 0):
@@ -125,4 +134,4 @@ def resetInput(hard = False, u = 0):
         Vars.ginput.write(0)
         return
     time.sleep(0.03)
-    Vars.ginput.write(calculateActualInput() | u)
+    Vars.ginput.write(calculateActualInput() | u | Vars.keepPressed)

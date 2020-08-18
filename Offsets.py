@@ -20,6 +20,7 @@ offsets["jumpCount"] = 0x1F0
 offsets["canDodge"] = 0x154
 offsets["canAttack"] = 0x3C
 offsets["groundWeaponX"] = 0xF0
+offsets["weaponPtrOffsets"] = [0x2BC, 0x44, 0x8]
 
 QUICK_ATTACK = 640
 HEAVY_ATTACK = 64
@@ -29,7 +30,6 @@ LEFT = 4
 RIGHT = 8
 DODGE = 256
 THROW = 516
-SPEAR = 0x00005F77
-SWORD = 0x00004222
-KATAR = 25411
+LANCE = 19449
+BLASTERS = 15929
 MELEE = 14969

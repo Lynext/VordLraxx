@@ -13,6 +13,8 @@ end = False
 map = "shipwreck"
 directStart = False
 started = False
+velMultiplier = 2
+keepPressed = 0
 
 # GAME INFO
 info = {}
