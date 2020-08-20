@@ -3,6 +3,7 @@ import Offsets
 from memorpy.WinStructures import PAGE_READWRITE
 import re
 from Player import Player
+from Bomb import Bomb
 import time
 
 def gTime ():
@@ -41,7 +42,7 @@ def canAttack ():
         return True
     return False
 
-def isBaseOfEntity(address):
+def checkIfPlayer(address):
     try:
         ptr = address
         for offset in Offsets.recursivePtrOffsets:
@@ -53,7 +54,7 @@ def isBaseOfEntity(address):
     else:
         return True
 
-def aobScan(entityPointers, start, size, pattern=None, offset = 0, entityCheck = False):
+def aobScan(entityPointers, start, size, pattern=None, offset = 0, entityCheck = False, entityCheckType = ""):
     allTheBytes = Vars.mem.process.read(Vars.mem.Address(start), type = 'bytes', maxlen = size)
     #print(allTheBytes)
     matches = re.finditer(pattern, allTheBytes)
@@ -61,11 +62,16 @@ def aobScan(entityPointers, start, size, pattern=None, offset = 0, entityCheck =
         span = match.span()
         if span:
             address = start + span[0] + offset
+            if address in entityPointers:
+                continue
+
             if not entityCheck:
                 entityPointers.append(address)
-            elif address not in entityPointers and isBaseOfEntity(address):
-                #print(match)
-                entityPointers.append(address)
+            else:
+                if entityCheckType == "Player" and checkIfPlayer(address):
+                    entityPointers.append(address)
+                elif entityCheckType == "Bomb" and checkIfBomb(address):
+                    entityPointers.append(address)
 
 def dereferenceOffsets(nameAndOffsets):
     modules = Vars.mem.process.list_modules()
@@ -75,8 +81,19 @@ def dereferenceOffsets(nameAndOffsets):
         ptr = Vars.mem.process.read(Vars.mem.Address(ptr + offset))
     return ptr
 
-def groundWeaponScan():
-    print('Scanning memory for ground weapons')
+def checkIfBomb (address):
+    rtn = True
+    try:
+        if not Vars.mem.Address(address + Offsets.offsets["isBombOffset"]).read(type='double') == 35.0:
+            rtn = False
+        if not Vars.mem.Address(address + Offsets.offsets["bombX"]).read(type='double') != 0.0:
+            rtn = False
+    except:
+        rtn = False
+    return rtn
+
+def bombScan ():
+    print('Scanning memory for bombs')
     modules = Vars.mem.process.list_modules()
     regions = Vars.mem.process.iter_region(start_offset = modules[Vars.PROCESS_NAME], protec = PAGE_READWRITE)
     entityPointers = []
@@ -85,9 +102,16 @@ def groundWeaponScan():
         #print(str(start) + " " + str(size))
         if len(entityPointers) >= 40:
             break
-        aobScan(entityPointers, start, size, pattern = Offsets.groundWeaponSig, offset = 0, entityCheck = False)
+        aobScan(entityPointers, start, size, pattern = Offsets.baseEntitySig, offset = 0, entityCheck = True, entityCheckType = "Bomb")
 
-    print('Found %d ground weapons: %s' % (len(entityPointers), ', '.join([hex(e) for e in entityPointers])))
+    print('Found %d bombs: %s' % (len(entityPointers), ', '.join([hex(e) for e in entityPointers])))
+    for i in entityPointers:
+        canAdd = True
+        for j in Vars.entities:
+            if Vars.entities[j].pointer == i:
+                canAdd = False
+        if canAdd:
+            addBomb(i)
     return entityPointers
 
 def entitiesAobScan():
@@ -100,7 +124,7 @@ def entitiesAobScan():
         #print(str(start) + " " + str(size))
         if len(entityPointers) >= 4:
             break
-        aobScan(entityPointers, start, size, pattern = Offsets.entitySig, offset = 0, entityCheck = True)
+        aobScan(entityPointers, start, size, pattern = Offsets.entitySig, offset = 0, entityCheck = True, entityCheckType = "Player")
 
     print('Found %d entities: %s' % (len(entityPointers), ', '.join([hex(e) for e in entityPointers])))
     entityPointers.remove(Vars.localPointer)
@@ -115,7 +139,8 @@ def findFirstPointers ():
     Vars.localPointer = dereferenceOffsets(Offsets.offsets["local"])
     Vars.entityPointers = entitiesAobScan()
     preparePlayers()
-    Vars.target = Vars.entities[2]
+    if Vars.mode != "BombDodgeMode":
+        Vars.target = Vars.entities[2]
     Vars.started = True
     print("Your hex : " + hex(Vars.localPointer))
     print("ginput hex: " + hex(ginputPtr))
@@ -128,6 +153,15 @@ def addPlayer (pointer):
     newPlayer.init()
     Vars.entities[newPlayer.id] = newPlayer
     return newPlayer
+
+def addBomb (pointer):
+    Vars.uniqueEntityID += 1
+    newBomb = Bomb()
+    newBomb.id = Vars.uniqueEntityID
+    newBomb.pointer = pointer
+    newBomb.init()
+    Vars.entities[newBomb.id] = newBomb
+    return newBomb
 
 def preparePlayers ():
     Vars.localPlayer = addPlayer(Vars.localPointer)

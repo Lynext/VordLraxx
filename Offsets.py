@@ -2,7 +2,7 @@
 ginputBaseOffset = 0x34
 
 entitySig = b"\x90\x64......................\x01"
-groundWeaponSig = b"\x90\x64\x30\x57\x02"
+baseEntitySig = b"\x90\x64" # Is it fully true ?
 recursivePtrOffsets = [0x268, 0x4c]
 
 offsets = {}
@@ -20,6 +20,11 @@ offsets["jumpCount"] = 0x1F0
 offsets["canDodge"] = 0x154
 offsets["canAttack"] = 0x3C
 offsets["groundWeaponX"] = 0xF0
+offsets["bombX"] = 0xF8
+offsets["bombY"] = 0xE8
+offsets["bombYVel"] = 0xB0
+offsets["bombXVel"] = 0xB8
+offsets["isBombOffset"] = 0x130 # DOUBLE, 35 IF BOMB
 offsets["weaponPtrOffsets"] = [0x2BC, 0x44, 0x8]
 
 QUICK_ATTACK = 640

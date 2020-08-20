@@ -1,25 +1,14 @@
 import Vars
 import Offsets
-import math
+from Player import Vector2
 
-class Vector2 ():
-    x = 0
-    y = 0
-    xDir = ""
-    yDir = ""
-
-class Player ():
-    type = "Player"
+class Bomb ():
+    type = "Bomb"
     id = 0
     x = 0
     y = 0
     xVel = 0
     yVel = 0
-    grounded = False
-    inAnimation = False
-    inStun = False
-    canAttack = False
-    jumpCount = 2
     name = "DefaultEntityName"
     pointer = 0
 
@@ -28,7 +17,6 @@ class Player ():
 
     def printInfo (self):
         print("[X] : " + str(self.x) + " [Y] : " + str(self.y))
-        print("Jumps : " + str(self.jumpCount))
 
     def dist (self, targ, type = "est", rtnType = "vec"):
         self.updateInfo()
@@ -86,36 +74,20 @@ class Player ():
             rtn.y = abs(rtn.y)
             return rtn
 
+    def isOnMap (self):
+        if Vars.mem.Address(self.pointer + Offsets.offsets["isBombOffset"]).read(type='double') == 35.0:
+            return True
+        return False
+
     def update (self):
         self.updateInfo()
+        if self.id == 3:
+            self.printInfo()
+        # if Vars.mem.Address(self.pointer + Offsets.offsets["isBombOffset"]).read(type='double') != 35.0:
+        #     Vars.entitiesToRemove.append(self.id)
 
     def updateInfo (self):
-        self.x = Vars.mem.Address(self.pointer + Offsets.offsets["x"]).read(type='double')
-        self.y = -Vars.mem.Address(self.pointer + Offsets.offsets["y"]).read(type='double')
-        self.xVel = Vars.mem.Address(self.pointer + Offsets.offsets["xVel"]).read(type='double')
-        self.yVel = -Vars.mem.Address(self.pointer + Offsets.offsets["yVel"]).read(type='double')
-        self.jumpCount = 2 - Vars.mem.Address(self.pointer + Offsets.offsets["jumpCount"]).read(type='int')
-        if Vars.mem.Address(self.pointer + Offsets.offsets["inAnimation"]).read(type='int') != 0:
-            self.inAnimation = True
-        else:
-            self.inAnimation = False
-
-        if Vars.mem.Address(self.pointer + Offsets.offsets["inStun"]).read(type='int') == 0:
-            self.inStun = True
-        else:
-            self.inStun = False
-
-        if Vars.mem.Address(self.pointer + Offsets.offsets["grounded"]).read(type='int') == 0:
-            self.grounded = True
-        else:
-            self.grounded = False
-
-        if Vars.mem.Address(self.pointer + Offsets.offsets["canDodge"]).read(type='int') == 0:
-            self.canDodge = True
-        else:
-            self.canDodge = False
-
-        if Vars.mem.Address(self.pointer + Offsets.offsets["canAttack"]).read(type='int') == 0:
-            self.canAttack = True
-        else:
-            self.canAttack = False
+        self.x = Vars.mem.Address(self.pointer + Offsets.offsets["bombX"]).read(type='double')
+        self.y = -Vars.mem.Address(self.pointer + Offsets.offsets["bombY"]).read(type='double')
+        self.xVel = Vars.mem.Address(self.pointer + Offsets.offsets["bombXVel"]).read(type='double')
+        self.yVel = -Vars.mem.Address(self.pointer + Offsets.offsets["bombYVel"]).read(type='double')

@@ -90,8 +90,26 @@ def SpamMaster ():
         Controller.sideHeavy(realEstDiff.xDir,0)
         time.sleep(0.5) # sucssesful, sleep
 
+def BombDodgeMode ():
+    #Utils.bombScan()
+    # for i in Vars.entities:
+    #     if Vars.entities[i].type == "Bomb" and Vars.entities[i].isOnMap():
+    #         print("Bomb found on map. ID : " + str(i))
+    #         realEstDiff = Vars.localPlayer.dist(Vars.entities[i], rtnType = "val", type = "real")
+    #         print("Diff :" + str(realEstDiff))
+    #         if realEstDiff < 50:
+    #             print("Dodging")
+    #             Controller.dodge()
+    #             break
+    # time.sleep(0.05)
+    pass
+
 def AI ():
     if Vars.mode == "Manuel":
+        return
+
+    if Vars.mode == "BombDodgeMode":
+        BombDodgeMode()
         return
 
     if not Vars.localPlayer.grounded and Vars.localPlayer.y < Vars.info["maps"][Vars.map]["fallOffsetY"]:
@@ -107,9 +125,9 @@ def AI ():
         OnlyDodge()
         return
 
-    # if Vars.mode == "SpamMaster":
-    #     SpamMaster()
-    #     return
+    if Vars.mode == "SpamMaster":
+        SpamMaster()
+        return
 
     if Vars.mode == "ZeroToDeath":
         ZeroToDeath()
@@ -118,13 +136,21 @@ def AI ():
 def update ():
     if Vars.end:
         exit()
+
     if not Vars.started:
         return
+
     if Vars.started and Vars.localPointer == 0:
         Utils.findFirstPointers()
-        #Utils.groundWeaponScan()
+        Utils.bombScan()
+
     for i in Vars.entities:
         Vars.entities[i].update()
+
+    for key in Vars.entitiesToRemove:
+        del Vars.entities[key]
+    Vars.entitiesToRemove = []
+
     if Vars.debug:
         Vars.localPlayer.printInfo()
     AI()
