@@ -21,7 +21,7 @@ def init ():
     print("Started!")
 
 def act (arg):
-    Controller.jump("right", 300)
+    ZeroAtmatik()
 
 def setMode (m):
     Vars.mode = m
@@ -54,16 +54,6 @@ def dontFallToDeath ():
     else:
         print("Cant dodge, cant jump and no heavy attack. We are prob dead.")
 
-def ZeroToDeath ():
-    realEstDiff = Vars.localPlayer.dist(Vars.target, type = "realEst")
-    if Vars.target.inAnimation and Vars.localPlayer.dist(Vars.target, rtnType = "val") <= 384:
-        if Utils.canDodge():
-            print('Cool Dodge')
-            Controller.dodge(Utils.reverseDir(realEstDiff.xDir), Offsets.UP)
-        elif Utils.canJump():
-            print('Jump Dodge')
-            Controller.jump(Utils.reverseDir(realEstDiff.xDir))
-
 def OnlyDodge ():
     realEstDiff = Vars.localPlayer.dist(Vars.target, type = "realEst")
     if Vars.target.inAnimation and Vars.localPlayer.dist(Vars.target, rtnType = "val") <= 384:
@@ -81,28 +71,75 @@ def SpamMaster ():
     if realEstDiff.x <= 512 and realEstDiff.y <= 16:
         Controller.sideQuick(realEstDiff.xDir)
         time.sleep(0.3)
-        Controller.neutralHeavy(realEstDiff.xDir,0)
+        Controller.neutralHeavy(realEstDiff.xDir, 0)
         Controller.resetInput()
     elif realEstDiff.yDir == "up" and realEstDiff.x >= 200 and realEstDiff.x <= 512 and realEstDiff.y >= 128 and realEstDiff.y <= 300:
-        Controller.neutralHeavy(realEstDiff.xDir,0)
-        time.sleep(0.5) # sucssesful, sleep
+        Controller.neutralHeavy(realEstDiff.xDir, 0)
+        time.sleep(0.5) # successful, sleep
     elif realEstDiff.x <= 512 and realEstDiff.y <= 300:
-        Controller.sideHeavy(realEstDiff.xDir,0)
-        time.sleep(0.5) # sucssesful, sleep
+        Controller.sideHeavy(realEstDiff.xDir, 0)
+        time.sleep(0.5) # successful, sleep
+
+def ZeroAtmatik ():
+    realEstDiff = Vars.localPlayer.dist(Vars.target, type = "realEst")
+    if realEstDiff.x <= 512 and realEstDiff.y <= 16:
+        Controller.sideQuick(realEstDiff.xDir)
+        time.sleep(0.3)
+        Vars.target.update()
+        if not Vars.target.canDodge:
+            print("target can't dodge.")
+            Controller.neutralHeavy(realEstDiff.xDir)
+        else:
+            print("target can dodge.")
+            time.sleep(0.35)
+            Controller.neutralHeavy(realEstDiff.xDir)
+
+def KatarCombo ():
+    realEstDiff = Vars.localPlayer.dist(Vars.target, type = "real")
+    if realEstDiff.x < 125 and realEstDiff.y <= 16:
+        Controller.run(Utils.reverseDir(realEstDiff.xDir), 50)
+        return
+    if realEstDiff.x > 125 and realEstDiff.x <= 480 and realEstDiff.y <= 16:
+        Controller.jump(duration = 60)
+
+        Controller.sideQuick(realEstDiff.xDir, Offsets.DOWN)
+        time.sleep(0.5)
+
+        Controller.sideQuick(realEstDiff.xDir)
+        time.sleep(0.4)
+
+        Vars.localPlayer.update()
+        Vars.target.update()
+        realEstDiff = Vars.localPlayer.dist(Vars.target, type = "real")
+
+        print(str(Vars.target.damageTaken))
+
+        if Vars.target.damageTaken <= 120:
+            Controller.dash(realEstDiff.xDir)
+            time.sleep(0.15)
+            Controller.downQuick()
+            time.sleep(0.5)
+
+            Vars.localPlayer.update()
+            Vars.target.update()
+            realEstDiff = Vars.localPlayer.dist(Vars.target, type = "real")
+            Controller.run(Utils.reverseDir(realEstDiff.xDir), 150)
+        else:
+            time.sleep(0.1)
+            Controller.sideHeavy(realEstDiff.xDir)
+            time.sleep(1)
 
 def BombDodgeMode ():
-    #Utils.bombScan()
-    # for i in Vars.entities:
-    #     if Vars.entities[i].type == "Bomb" and Vars.entities[i].isOnMap():
-    #         print("Bomb found on map. ID : " + str(i))
-    #         realEstDiff = Vars.localPlayer.dist(Vars.entities[i], rtnType = "val", type = "real")
-    #         print("Diff :" + str(realEstDiff))
-    #         if realEstDiff < 50:
-    #             print("Dodging")
-    #             Controller.dodge()
-    #             break
-    # time.sleep(0.05)
-    pass
+    Utils.bombScan()
+    for i in Vars.entities:
+        if Vars.entities[i].type == "Bomb" and Vars.entities[i].isOnMap():
+            print("Bomb found on map. ID : " + str(i))
+            realEstDiff = Vars.localPlayer.dist(Vars.entities[i], rtnType = "val", type = "real")
+            print("Diff :" + str(realEstDiff))
+            if realEstDiff < 50:
+                print("Dodging")
+                Controller.dodge()
+                break
 
 def AI ():
     if Vars.mode == "Manuel":
@@ -129,8 +166,8 @@ def AI ():
         SpamMaster()
         return
 
-    if Vars.mode == "ZeroToDeath":
-        ZeroToDeath()
+    if Vars.mode == "KatarCombo":
+        KatarCombo()
         return
 
 def update ():
@@ -142,7 +179,8 @@ def update ():
 
     if Vars.started and Vars.localPointer == 0:
         Utils.findFirstPointers()
-        Utils.bombScan()
+        if Vars.mode == "BombDodgeMode":
+            Utils.bombScan()
 
     for i in Vars.entities:
         Vars.entities[i].update()
@@ -154,7 +192,6 @@ def update ():
     if Vars.debug:
         Vars.localPlayer.printInfo()
     AI()
-    #time.sleep(0.016 / 10)
 
 init()
 while True:

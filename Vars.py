@@ -1,7 +1,7 @@
 PROCESS_NAME = b'Brawlhalla.exe'
 mem = None
 debug = False
-mode = "BombDodgeMode"
+mode = "Manuel"
 localPointer = 0
 localPlayer = None
 target = None
@@ -14,7 +14,7 @@ end = False
 map = "shipwreck"
 directStart = False
 started = False
-velMultiplier = 2
+velMultiplier = 1
 keepPressed = 0
 
 # GAME INFO

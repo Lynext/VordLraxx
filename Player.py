@@ -15,11 +15,13 @@ class Player ():
     y = 0
     xVel = 0
     yVel = 0
+    damageTaken = 0
     grounded = False
     inAnimation = False
     inStun = False
     canAttack = False
     jumpCount = 2
+    isDodgingCurrently = False
     name = "DefaultEntityName"
     pointer = 0
 
@@ -92,6 +94,7 @@ class Player ():
     def updateInfo (self):
         self.x = Vars.mem.Address(self.pointer + Offsets.offsets["x"]).read(type='double')
         self.y = -Vars.mem.Address(self.pointer + Offsets.offsets["y"]).read(type='double')
+        self.damageTaken = Vars.mem.Address(self.pointer + Offsets.offsets["damageTaken"]).read(type='double')
         self.xVel = Vars.mem.Address(self.pointer + Offsets.offsets["xVel"]).read(type='double')
         self.yVel = -Vars.mem.Address(self.pointer + Offsets.offsets["yVel"]).read(type='double')
         self.jumpCount = 2 - Vars.mem.Address(self.pointer + Offsets.offsets["jumpCount"]).read(type='int')
@@ -119,3 +122,8 @@ class Player ():
             self.canAttack = True
         else:
             self.canAttack = False
+
+        if Vars.mem.Address(self.pointer + Offsets.offsets["isDodgingCurrently"]).read(type='double') == 0:
+            self.isDodgingCurrently = True
+        else:
+            self.isDodgingCurrently = False
