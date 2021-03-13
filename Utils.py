@@ -122,12 +122,11 @@ def entitiesAobScan():
     print("Performing deep scan for entities")
     for start, size in regions:
         #print(str(start) + " " + str(size))
-        if len(entityPointers) >= 4:
-            break
         aobScan(entityPointers, start, size, pattern = Offsets.entitySig, offset = 0, entityCheck = True, entityCheckType = "Player")
 
     print('Found %d entities: %s' % (len(entityPointers), ', '.join([hex(e) for e in entityPointers])))
     entityPointers.remove(Vars.localPointer)
+    print ('If I am still running, eveything should be fine...')
     return entityPointers
 
 def findFirstPointers ():
@@ -135,15 +134,16 @@ def findFirstPointers ():
     print("Finding pointers..")
     Vars.entities = {}
     ginputPtr = dereferenceOffsets(Offsets.offsets["ginput"])
+    print("ginput hex: " + hex(ginputPtr))
     Vars.ginput = Vars.mem.Address(ginputPtr + Offsets.ginputBaseOffset)
     Vars.localPointer = dereferenceOffsets(Offsets.offsets["local"])
-    Vars.entityPointers = entitiesAobScan()
-    preparePlayers()
-    if Vars.mode != "BombDodgeMode":
-        Vars.target = Vars.entities[2]
-    Vars.started = True
     print("Your hex : " + hex(Vars.localPointer))
-    print("ginput hex: " + hex(ginputPtr))
+    Vars.entityPointers = entitiesAobScan()
+    #preparePlayers()
+    #if Vars.mode != "BombDodgeMode":
+        #Vars.target = Vars.entities[2]
+    Vars.started = True
+    
 
 def addPlayer (pointer):
     Vars.uniqueEntityID += 1
@@ -168,9 +168,9 @@ def preparePlayers ():
     for i in Vars.entityPointers:
         addPlayer(i)
 
-def getModule(module):
-    returnModule = pyVars.mem.process.module_from_name(Vars.pm.process_handle, module)
-    return returnModule
+#def getModule(module):
+    #returnModule = pyVars.mem.process.module_from_name(Vars.pm.process_handle, module)
+    #return returnModule
 
 def listModules ():
     modules = Vars.mem.process.list_modules()
